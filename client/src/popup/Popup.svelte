@@ -29,10 +29,10 @@
 <main>
     <div class="popup-container">
         {#if isBad == true}
-            <p class="header"> Monas</p>
+            <p class="header">MONAS</p>
             <p id='bad-text'>SUSPICIOUS CONTENT DETECTED!</p>
         {:else}
-            <p class="header"> Monas</p>
+            <p class="header">MONAS</p>
             <p id='good-text'>Nothing Wrong</p>
         {/if}
     </div>
@@ -88,11 +88,11 @@
     }
 
     .header{
-        padding-top: 10px;
+        padding-top: 50px;
         font-weight : bold ;
         font-family: 'JetBrains Mono', monospace;
         font-size: 2rem;
-        color: blue;
+        color: #2B8DE7;
     }
   </style>
   
