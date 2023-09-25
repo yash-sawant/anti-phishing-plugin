@@ -1,6 +1,7 @@
 <script>
-    let content = '';
-    $: isBad = content.includes("CS Cup 2023");
+    let isBad = false;
+    // let content = '';
+    // $: isBad = content.includes("Net Bank Customer");
 
     function getContent(){
         chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
@@ -15,10 +16,51 @@
                 }, (results) => {
                     if (results && results[0] && results[0].result) {
                         const documentElement = results[0].result;
-                        content = documentElement;
-                    } else {
-                        console.log({ error: 'Failed to retrieve HTML' });
-                    }
+                        const content = documentElement;
+
+                        const apiUrl = 'http://127.0.0.1:8080/classify_email';
+
+                        // Create an object with the data you want to send in JSON format
+                        const postData = {
+                            'text': content
+                        };
+
+                        // Create the request headers, specifying that you're sending JSON
+                        const headers = new Headers({
+                          'Content-Type': 'application/json',
+                        });
+
+                        // Create the request object
+                        const requestOptions = {
+                          method: 'POST',
+                          headers: headers,
+                          body: JSON.stringify(postData),
+                        };
+
+                        // Make the POST request using the fetch API
+                        fetch(apiUrl, requestOptions)
+                          .then(response => {
+                            if (!response.ok) {
+                              throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.json(); // Parse the response JSON
+                          })
+                          .then(data => {
+                            // Handle the response data here
+                            console.log('Response Data:', data);
+                            if(data["message"][0][0]["label"] == "LEGIT"){
+                                isBad = data["message"][0][0]["score"] <= data["message"][0][1]["score"]
+                            }else{
+                                isBad = data["message"][0][0]["score"] >= data["message"][0][1]["score"]
+                            }
+                          })
+                          .catch(error => {
+                            // Handle any errors that occurred during the fetch
+                            console.error('Fetch Error:', error);
+                          });
+                        } else {
+                            console.log({ error: 'Failed to retrieve HTML' });
+                        }
                 });
             }
         });
